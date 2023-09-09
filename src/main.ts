@@ -2,9 +2,14 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { resourceToModel } from './utils/mapping/resourceToModel.mapping';
+import { modelToResource } from './utils/mapping/modelToResource.mapping';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  modelToResource();
+  resourceToModel();
 
   app.enableCors({ });
   
