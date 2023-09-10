@@ -134,6 +134,14 @@ export class DogImplService implements DogService {
         try {
 
             const responseDog = await this.dogRepository.update({ owner_id: owner_id, id: id }, dogRequest);
+
+            if (!responseDog) {
+                throw new ErrorManager({
+                    type: 'NOT_FOUND',
+                    message: `Dog not was found to update`
+                })
+            }
+
             const mapDog = mapper.map(responseDog, Dog, DogResponseDTO);
             return {
                 success: true,

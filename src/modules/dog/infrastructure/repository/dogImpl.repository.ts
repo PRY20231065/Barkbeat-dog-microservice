@@ -15,6 +15,10 @@ export class DogImplRepository implements DogRepository {
     ) { }
 
     async update(key: DogKey, dog: Partial<Dog>): Promise<Dog> {
+        const findDog = await this.dogModel.get(key);
+        if(!findDog){
+            return null;
+        }
         const dogUpdated = await this.dogModel.update(key, dog);
         return dogUpdated;
     }
