@@ -3,7 +3,8 @@ import { DogRepository } from "../../domain/interface/dog.repository";
 import { Dog, DogKey } from "../../domain/model/dog.model";
 import { InjectModel, Model } from "nestjs-dynamoose";
 import * as uuid from 'uuid';
-import { ByBreedPaginatedStartKey } from "../../application/dto/pagination/by-breed-paginated.request";
+import { IPaginatedStartKey } from "src/utils/generic";
+
 
 @Injectable()
 export class DogImplRepository implements DogRepository {
@@ -23,9 +24,21 @@ export class DogImplRepository implements DogRepository {
         return dog;
     }
 
-    async findDogsByOwnerId(ownerId: string): Promise<Dog[]> {
-        const dogs = await this.dogModel.query('owner_id').eq(ownerId).exec();
-        return dogs;
+    async findDogsByOwnerId(owner_id: string, size: string, startKey: string): Promise<any> {
+        const queryCount = await this.dogModel.query('owner_id').eq(owner_id);
+        const totalCount = await queryCount.count().exec();
+
+        const queryItems = await this.dogModel.query('owner_id').eq(owner_id);
+        
+
+        if(size) queryItems.limit(+size);
+        if(startKey) {
+            const startKeyObj = (JSON.parse(startKey) as IPaginatedStartKey)
+            queryItems.startAt(startKeyObj);
+        }
+
+        const dogs = await queryItems.exec();
+        return {dogs, totalCount};
     }
 
     async create(dog: Dog): Promise<Dog> {
@@ -35,26 +48,48 @@ export class DogImplRepository implements DogRepository {
     }
 
 
-    async findAll(): Promise<Dog[]> {
-        return await this.dogModel.scan().exec();
+    async findAll(size: string, startKey: string): Promise<any> {
+        const totalCount = await this.dogModel.scan().count().exec();
+        const queryItems = await this.dogModel.scan();
+
+        if(size) queryItems.limit(+size);
+        if(startKey) {
+            const startKeyObj = (JSON.parse(startKey) as IPaginatedStartKey)
+            queryItems.startAt(startKeyObj);
+        }
+
+        const dogs = await queryItems.exec();
+        return {dogs, totalCount};
+
     }
 
-    async findDogsByVeterinarianId(vetId: string): Promise<Dog[]> {
-        const dogs = await this.dogModel.query('veterinarian_id').eq(vetId).exec();
-        return dogs;
-    }
-
-    async findDogsByBreedId(breedId: string, size: string, startKey: string): Promise<any> {
-
-        const queryCount = await this.dogModel.query('breed_id').eq(breedId);
+    async findDogsByVeterinarianId(vet_id: string, size: string, startKey: string): Promise<any> {
+        const queryCount = await this.dogModel.query('veterinarian_id').eq(vet_id);
         const totalCount = await queryCount.count().exec();
 
-        const queryItems = await this.dogModel.query('breed_id').eq(breedId);
+        const queryItems = await this.dogModel.query('veterinarian_id').eq(vet_id);
+        
+        if(size) queryItems.limit(+size);
+        if(startKey) {
+            const startKeyObj = (JSON.parse(startKey) as IPaginatedStartKey)
+            queryItems.startAt(startKeyObj);
+        }
+
+        const dogs = await queryItems.exec();
+        return {dogs, totalCount};
+    }
+
+    async findDogsByBreedId(breed_id: string, size: string, startKey: string): Promise<any> {
+
+        const queryCount = await this.dogModel.query('breed_id').eq(breed_id);
+        const totalCount = await queryCount.count().exec();
+
+        const queryItems = await this.dogModel.query('breed_id').eq(breed_id);
         
 
         if(size) queryItems.limit(+size);
         if(startKey) {
-            const startKeyObj = (JSON.parse(startKey) as ByBreedPaginatedStartKey)
+            const startKeyObj = (JSON.parse(startKey) as IPaginatedStartKey)
             queryItems.startAt(startKeyObj);
         }
 

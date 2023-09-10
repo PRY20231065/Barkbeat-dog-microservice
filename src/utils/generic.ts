@@ -23,5 +23,7 @@ export interface IPaginatedResponse<T> {
 
 export interface IPaginatedStartKey {
     id: string;
+    breed_id: string;
+    owner_id: string;
 }
 

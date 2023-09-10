@@ -3,7 +3,7 @@ import { DogImplService } from "../../application/service/dogimpl.service";
 import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common";
 import { CreateDogRequestDTO } from "../../application/dto/create-dog.request.dto";
 import { DogRequestDTO } from "../../application/dto/dog.request.dto";
-import { ByBreedPaginatedRequest, ByBreedPaginatedStartKey } from "../../application/dto/pagination/by-breed-paginated.request";
+import { PaginatedRequest } from "../../application/dto/pagination/paginated.request";
 
 
 
@@ -31,9 +31,11 @@ export class DogController {
     }
 
     @ApiOperation({ summary: 'Obtener todos los dog' })
+    @ApiQuery({ name: 'size', type: Number, required: false })
+    @ApiQuery({ name: 'startKey', type: String, required: false })
     @Get()
-    async getDogs(){
-        return await this.dogService.findAllDogs();
+    async getDogs(@Query() pagination: PaginatedRequest){
+        return await this.dogService.findAllDogs(pagination);
     }
 
     /*@ApiOperation({ summary: 'Obtener dogs por OwnerId' })
@@ -47,8 +49,26 @@ export class DogController {
     @ApiQuery({ name: 'breed_id', type: String, required: true })
     @ApiQuery({ name: 'size', type: Number, required: false })
     @ApiQuery({ name: 'startKey', type: String, required: false })
-    @Get('filter')
-    async getDogsByBreedId(@Query() pagination: ByBreedPaginatedRequest){
+    @Get('filterByBreed')
+    async getDogsByBreedId(@Query() pagination: PaginatedRequest){
         return await this.dogService.findDogsByBreedId(pagination);
+    }
+
+    @ApiOperation({ summary: 'Obtener dogs por OwnerId' })
+    @ApiQuery({ name: 'owner_id', type: String, required: true })
+    @ApiQuery({ name: 'size', type: Number, required: false })
+    @ApiQuery({ name: 'startKey', type: String, required: false })
+    @Get('filterByOwner')
+    async getDogsByOwnerId(@Query() pagination: PaginatedRequest){
+        return await this.dogService.findDogsByOwnerId(pagination);
+    }
+
+    @ApiOperation({ summary: 'Obtener dogs por VetId' })
+    @ApiQuery({ name: 'vet_id', type: String, required: true })
+    @ApiQuery({ name: 'size', type: Number, required: false })
+    @ApiQuery({ name: 'startKey', type: String, required: false })
+    @Get('filterByVet')
+    async getDogsByVetId(@Query() pagination: PaginatedRequest){
+        return await this.dogService.findDogsByVeterinarianId(pagination);
     }
 }
