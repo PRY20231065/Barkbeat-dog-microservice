@@ -1,19 +1,13 @@
 import { AutoMap } from "@automapper/classes";
 import { ApiProperty } from "@nestjs/swagger";
 import { Transform, TransformFnParams } from "class-transformer";
-import { IsDecimal, IsNotEmpty, IsNumber, Max, Min } from "class-validator";
+import { IsNotEmpty, IsNumber, IsOptional, Max, Min } from "class-validator";
 
-export class CreateDogRequestDTO {
-
-    //id como es clave de ordenacion se genera
+export class DogRequestDTO {
     
     @ApiProperty()
     @IsNotEmpty()
-    @AutoMap()
-    owner_id: string;
-    
-    @ApiProperty()
-    @IsNotEmpty()
+    @IsOptional()
     @AutoMap()
     name: string;
 
@@ -21,10 +15,12 @@ export class CreateDogRequestDTO {
     @Max(15)
     @Min(1)
     @IsNumber()
+    @IsOptional()
     @AutoMap()
     age: number;
 
     @ApiProperty()
+    @IsOptional()
     @Transform((params: TransformFnParams) => {
         console.log(params)
         return parseFloat(params.value);
@@ -32,17 +28,20 @@ export class CreateDogRequestDTO {
     @AutoMap()
     weight: number;
 
-    @ApiProperty()
+    @ApiProperty({})
+    @IsOptional()
     @IsNotEmpty()
     @AutoMap()
     veterinarian_id: string;
 
     @ApiProperty()
     @IsNotEmpty()
+    @IsOptional()
     @AutoMap()
     breed_id: string;
 
     @ApiProperty()
+    @IsOptional()
     @AutoMap()
     note: string;
 }

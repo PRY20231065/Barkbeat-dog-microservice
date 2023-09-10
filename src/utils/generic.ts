@@ -6,23 +6,22 @@ export interface IGenericResponse<T> {
 }
 
 export interface IPaginatedRequest {
-    page: number;
-    size: number;
-    sortBy: string,
-    sortOrder: sortOrder
+    startKey: string;
+    size: string;
 }
 
-export enum sortOrder {
-    ASC = 'ASC',
-    DESC = 'DESC'
-}
 
 //con 2 campos: sortBy (campo), sortOrder (ASC o DESC)
 export interface IPaginatedResponse<T> {
     success: boolean;
     items?: Array<T>;
     recordsTotal: number;
-    page: number;
+    startKey: string;
+    lastKey: string;
     size: number;
+}
+
+export interface IPaginatedStartKey {
+    id: string;
 }
 
