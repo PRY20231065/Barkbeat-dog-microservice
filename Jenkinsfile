@@ -17,6 +17,7 @@ pipeline {
             agent any
             steps {
                 sh "docker stop ${NAME}-container"
+                sh "docker rm ${NAME}-container"
             }
         }
 
