@@ -71,7 +71,7 @@ export async function validateVetExistence(vetId: string, jwtService: JwtService
 
     await firstValueFrom(
         httpService.get(
-            `${process.env.USER_API_URL}/vets/${vetId}`,
+            `${process.env.USER_API_URL}/veterinarians/${vetId}`,
             requestConfig).pipe(
                 catchError((error: AxiosError) => {
                     const data: any = error.response? error.response.data: error.cause;
