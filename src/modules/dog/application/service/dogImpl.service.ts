@@ -13,13 +13,15 @@ import { PaginatedRequest } from '../dto/pagination/paginated.request';
 import { BreedImplRepository } from 'src/modules/breed/infrastructure/repository/breedImpl.repository';
 import { validateBreedExistence, validateOwnerExistence, validateVetExistence } from 'src/utils/functions/aggregate-validation';
 import { HttpService } from '@nestjs/axios';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class DogImplService implements DogService {
     constructor(
         private readonly dogRepository: DogImplRepository,
         private readonly breedRepository: BreedImplRepository,
-        private readonly httpService: HttpService
+        private readonly httpService: HttpService,
+        private readonly jwtService: JwtService
     ) { }
 
     async findOneDogByOwnerIdAndId(owner_id: string, id: string): Promise<IGenericResponse<DogResponseDTO>> {
@@ -201,9 +203,9 @@ export class DogImplService implements DogService {
             await validateBreedExistence(dogRequest.breed_id, this.breedRepository);
         }
         if (dogRequest.veterinarian_id !== null) {
-            await validateVetExistence(dogRequest.veterinarian_id, this.httpService);
+            await validateVetExistence(dogRequest.veterinarian_id,  this.jwtService ,this.httpService);
         }
-        await validateOwnerExistence(dogRequest.owner_id, this.httpService);
+        await validateOwnerExistence(dogRequest.owner_id,  this.jwtService ,this.httpService);
     }
 
     async validateGlobalKeysToUpdate(dogRequest: Partial<CreateDogRequestDTO>) {
@@ -211,7 +213,7 @@ export class DogImplService implements DogService {
             await validateBreedExistence(dogRequest.breed_id, this.breedRepository);
         }
         if (dogRequest.veterinarian_id !== null) {
-            await validateVetExistence(dogRequest.veterinarian_id, this.httpService);
+            await validateVetExistence(dogRequest.veterinarian_id, this.jwtService ,this.httpService);
         }
     }
 

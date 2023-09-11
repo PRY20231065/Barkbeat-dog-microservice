@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import { BreedImplRepository } from "src/modules/breed/infrastructure/repository/breedImpl.repository";
 import { DogImplRepository } from "src/modules/dog/infrastructure/repository/dogImpl.repository";
 import { HttpService } from "@nestjs/axios";
+import { JwtService } from "@nestjs/jwt";
 
 export async function validateBreedExistence(breedId: string, breedRepository: BreedImplRepository) {
     const breed = await breedRepository.findOne({ id: breedId });
@@ -25,10 +26,12 @@ export async function validateDogExistence(dogId: string, ownerId: string, dogRe
     }
 }
 
-export async function validateOwnerExistence(ownerId: string, httpService: HttpService) {
+export async function validateOwnerExistence(ownerId: string, jwtService: JwtService ,httpService: HttpService) {
+    const token = await generateBearerToken(jwtService);
     const requestConfig = {
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
     };
 
@@ -57,10 +60,12 @@ export async function validateOwnerExistence(ownerId: string, httpService: HttpS
     );
 }
 
-export async function validateVetExistence(vetId: string, httpService: HttpService) {
+export async function validateVetExistence(vetId: string, jwtService: JwtService, httpService: HttpService) {
+    const token = await generateBearerToken(jwtService);
     const requestConfig = {
         headers: {
             'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
         },
     };
 
@@ -88,4 +93,19 @@ export async function validateVetExistence(vetId: string, httpService: HttpServi
                 }),
             )
     );
+}
+
+
+
+async function generateBearerToken(jwtService: JwtService): Promise<string> {
+    const payload = {
+        agw: process.env.PAYLOAD_AGW_KEY,
+        exp: Math.round(
+            (new Date().getTime() / 1000)
+            + Number(process.env.PAYLOAD_EXP_TIME),
+        ),
+    };
+    
+
+    return await jwtService.signAsync(payload);
 }

@@ -6,6 +6,9 @@ import { DogImplService } from './application/service/dogimpl.service';
 import { DogController } from './infrastructure/controller/dog.controller';
 import { BreedModule } from '../breed/breed.module';
 import { HttpModule } from '@nestjs/axios';
+import { JwtModule } from '@nestjs/jwt';
+import * as fs from 'fs';
+import * as path from 'path';
 
 @Module({
     imports: [
@@ -16,7 +19,14 @@ import { HttpModule } from '@nestjs/axios';
             },
         ]),
         BreedModule,
-        HttpModule
+        HttpModule,
+        JwtModule.registerAsync({
+            useFactory: async () => ({
+                privateKey: fs.readFileSync(path.resolve(__dirname, '../../keys/private.key')),
+                publicKey: fs.readFileSync(path.resolve(__dirname, '../../keys/public.key')),
+                signOptions: { algorithm: 'RS256' },
+            }),
+        }),
     ],
     controllers: [DogController],
     providers: [DogImplService, DogImplRepository],

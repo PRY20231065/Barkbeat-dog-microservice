@@ -13,13 +13,15 @@ import { HttpService } from "@nestjs/axios";
 import { ConfigService } from "@nestjs/config";
 import { DogImplRepository } from "src/modules/dog/infrastructure/repository/dogImpl.repository";
 import { validateDogExistence, validateVetExistence } from "src/utils/functions/aggregate-validation";
+import { JwtService } from "@nestjs/jwt";
 
 @Injectable()
 export class GoalImplService implements GoalService {
     constructor(
         private readonly goalRepository: GoalImplRepository,
         private readonly dogRepository: DogImplRepository,
-        private readonly httpService: HttpService
+        private readonly httpService: HttpService,
+        private readonly jwtService: JwtService
     ){}
     
     async createGoal(goal: CreateGoalRequestDTO): Promise<IGenericResponse<CreateGoalResponseDTO>> {
@@ -129,7 +131,7 @@ export class GoalImplService implements GoalService {
     async validateGlobalKeys(goalRequest: CreateGoalRequestDTO) {
 
         if (goalRequest.veterinarian_id !== null) {
-            await validateVetExistence(goalRequest.veterinarian_id, this.httpService);
+            await validateVetExistence(goalRequest.veterinarian_id, this.jwtService, this.httpService);
         }
         await validateDogExistence(goalRequest.dog_id,goalRequest.owner_id,this.dogRepository);
     }
