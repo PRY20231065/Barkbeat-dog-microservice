@@ -15,6 +15,8 @@ export class Goal extends GoalKey {
     @AutoMap()
     veterinarian_id: string;
     @AutoMap()
+    owner_id: string;
+    @AutoMap()
     is_completed: boolean;
     @AutoMap()
     created_date: string;

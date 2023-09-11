@@ -9,15 +9,24 @@ import { GoalResponseDTO } from "../dto/goal.response.dto";
 import { ErrorManager } from "src/utils/errors/error.manager";
 import { mapper } from "src/utils/mapping/mapper";
 import { Goal } from "../../domain/model/goal.model";
+import { HttpService } from "@nestjs/axios";
+import { ConfigService } from "@nestjs/config";
+import { DogImplRepository } from "src/modules/dog/infrastructure/repository/dogImpl.repository";
+import { validateDogExistence, validateVetExistence } from "src/utils/functions/aggregate-validation";
 
 @Injectable()
 export class GoalImplService implements GoalService {
     constructor(
-        private readonly goalRepository: GoalImplRepository
+        private readonly goalRepository: GoalImplRepository,
+        private readonly dogRepository: DogImplRepository,
+        private readonly httpService: HttpService
     ){}
     
     async createGoal(goal: CreateGoalRequestDTO): Promise<IGenericResponse<CreateGoalResponseDTO>> {
         try{
+
+            await this.validateGlobalKeys(goal);
+
             const goalModel = mapper.map(goal, CreateGoalRequestDTO, Goal);
 
             const responseGoal = await this.goalRepository.create(goalModel);
@@ -116,4 +125,13 @@ export class GoalImplService implements GoalService {
             lastKey: undefined
         }
     }
+
+    async validateGlobalKeys(goalRequest: CreateGoalRequestDTO) {
+
+        if (goalRequest.veterinarian_id !== null) {
+            await validateVetExistence(goalRequest.veterinarian_id, this.httpService);
+        }
+        await validateDogExistence(goalRequest.dog_id,goalRequest.owner_id,this.dogRepository);
+    }
+
 }

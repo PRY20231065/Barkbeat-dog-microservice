@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { DogImplRepository } from '../../infrastructure/repository/dogImpl.repository';
 import { DogService } from '../../domain/interface/dog.service';
-import { IGenericResponse, IPaginatedRequest, IPaginatedResponse } from 'src/utils/generic';
+import { IGenericResponse, IPaginatedResponse } from 'src/utils/generic';
 import { CreateDogRequestDTO } from '../dto/create-dog.request.dto';
 import { CreateDogResponseDTO } from '../dto/create-dog.response.dto';
 import { mapper } from 'src/utils/mapping/mapper';
@@ -11,20 +11,15 @@ import { DogRequestDTO } from '../dto/dog.request.dto';
 import { DogResponseDTO } from '../dto/dog.response.dto';
 import { PaginatedRequest } from '../dto/pagination/paginated.request';
 import { BreedImplRepository } from 'src/modules/breed/infrastructure/repository/breedImpl.repository';
-import * as https from 'https';
+import { validateBreedExistence, validateOwnerExistence, validateVetExistence } from 'src/utils/functions/aggregate-validation';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-import { catchError, firstValueFrom } from 'rxjs';
-import { getKeyByValue } from 'src/utils/functions/generic-functions';
-import { AxiosError } from 'axios';
 
 @Injectable()
 export class DogImplService implements DogService {
     constructor(
         private readonly dogRepository: DogImplRepository,
         private readonly breedRepository: BreedImplRepository,
-        private readonly httpService: HttpService,
-        private configService: ConfigService
+        private readonly httpService: HttpService
     ) { }
 
     async findOneDogByOwnerIdAndId(owner_id: string, id: string): Promise<IGenericResponse<DogResponseDTO>> {
@@ -203,94 +198,23 @@ export class DogImplService implements DogService {
 
     async validateGlobalKeys(dogRequest: CreateDogRequestDTO) {
         if (dogRequest.breed_id !== null) {
-            await this.validateBreedExistence(dogRequest.breed_id);
+            await validateBreedExistence(dogRequest.breed_id, this.breedRepository);
         }
         if (dogRequest.veterinarian_id !== null) {
-            await this.validateVetExistence(dogRequest.veterinarian_id);
+            await validateVetExistence(dogRequest.veterinarian_id, this.httpService);
         }
-        await this.validateOwnerExistence(dogRequest.owner_id);
+        await validateOwnerExistence(dogRequest.owner_id, this.httpService);
     }
 
     async validateGlobalKeysToUpdate(dogRequest: Partial<CreateDogRequestDTO>) {
         if (dogRequest.breed_id !== null) {
-            await this.validateBreedExistence(dogRequest.breed_id);
+            await validateBreedExistence(dogRequest.breed_id, this.breedRepository);
         }
         if (dogRequest.veterinarian_id !== null) {
-            await this.validateVetExistence(dogRequest.veterinarian_id);
+            await validateVetExistence(dogRequest.veterinarian_id, this.httpService);
         }
     }
 
-    async validateBreedExistence(breedId: string) {
-        const breed = await this.breedRepository.findOne({ id: breedId });
-        if (!breed) {
-            throw new ErrorManager({
-                type: 'NOT_FOUND',
-                message: `breed_id does not correspond to an existing breed`
-            });
-        }
-    }
-
-    async validateOwnerExistence(ownerId: string) {
-        const requestConfig = {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        };
-
-        await firstValueFrom(
-            this.httpService.get(
-                `${this.configService.get<string>('USER_API_URL')}/owners/${ownerId}`,
-                requestConfig).pipe(
-                    catchError((error: AxiosError) => {
-                        const data: any = error.response.data;
-
-                        if(data.code == 404){
-                            throw new ErrorManager({
-                                type: 'NOT_FOUND',
-                                message: `owner_id does not correspond to an existing owner`
-                            });
-                        }
-                        else{
-                            throw new ErrorManager({
-                                type: 'BAD_REQUEST',
-                                message: data.message
-                            });
-                        }
-
-                    }),
-                )
-        );
-    }
-
-    async validateVetExistence(vetId: string) {
-        const requestConfig = {
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        };
-
-        await firstValueFrom(
-            this.httpService.get(
-                `${this.configService.get<string>('USER_API_URL')}/vets/${vetId}`,
-                requestConfig).pipe(
-                    catchError((error: AxiosError) => {
-                        const data: any = error.response.data;
-
-                        if(data.code == 404){
-                            throw new ErrorManager({
-                                type: 'NOT_FOUND',
-                                message: `veterinarian_id does not correspond to an existing vet`
-                            });
-                        }
-                        else{
-                            throw new ErrorManager({
-                                type: 'BAD_REQUEST',
-                                message: data.message
-                            });
-                        }
-
-                    }),
-                )
-        );
-    }
+    
 }
+

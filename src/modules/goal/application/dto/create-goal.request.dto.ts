@@ -17,6 +17,11 @@ export class CreateGoalRequestDTO {
     @ApiProperty()
     @IsNotEmpty()
     @AutoMap()
+    owner_id: string;
+
+    @ApiProperty()
+    @IsNotEmpty()
+    @AutoMap()
     dog_id: string;
 
     @ApiProperty()

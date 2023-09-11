@@ -5,6 +5,7 @@ import { GoalImplRepository } from './infrastructure/repository/goalImpl.reposit
 import { GoalController } from './infrastructure/controller/goal.controller';
 import { HttpModule } from '@nestjs/axios';
 import { GoalSchema } from './domain/schema/goal.schema';
+import { DogModule } from '../dog/dog.module';
 
 @Module({
     imports: [
@@ -14,7 +15,8 @@ import { GoalSchema } from './domain/schema/goal.schema';
                 schema: GoalSchema,
             },
         ]),
-        HttpModule
+        HttpModule,
+        DogModule
     ],
     controllers: [GoalController],
     providers: [GoalImplService, GoalImplRepository],

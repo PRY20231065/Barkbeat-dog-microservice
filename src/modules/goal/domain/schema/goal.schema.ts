@@ -10,6 +10,9 @@ export const GoalSchema = new Schema({
         type: String,
         hashKey: true
     },
+    owner_id:{
+        type: String
+    },
     title:{
         type: String
     },

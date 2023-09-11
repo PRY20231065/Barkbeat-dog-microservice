@@ -20,6 +20,6 @@ import { HttpModule } from '@nestjs/axios';
     ],
     controllers: [DogController],
     providers: [DogImplService, DogImplRepository],
-    exports:[DogImplService]
+    exports:[DogImplRepository]
 })
 export class DogModule { }
