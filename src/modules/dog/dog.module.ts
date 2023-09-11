@@ -4,6 +4,8 @@ import { DogSchema } from './domain/schema/dog.schema';
 import { DogImplRepository } from './infrastructure/repository/dogImpl.repository';
 import { DogImplService } from './application/service/dogimpl.service';
 import { DogController } from './infrastructure/controller/dog.controller';
+import { BreedModule } from '../breed/breed.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
     imports: [
@@ -13,9 +15,11 @@ import { DogController } from './infrastructure/controller/dog.controller';
                 schema: DogSchema,
             },
         ]),
-
+        BreedModule,
+        HttpModule
     ],
     controllers: [DogController],
     providers: [DogImplService, DogImplRepository],
+    exports:[DogImplService]
 })
 export class DogModule { }

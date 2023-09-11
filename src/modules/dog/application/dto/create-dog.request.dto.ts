@@ -26,7 +26,6 @@ export class CreateDogRequestDTO {
 
     @ApiProperty()
     @Transform((params: TransformFnParams) => {
-        console.log(params)
         return parseFloat(params.value);
       })
     @AutoMap()

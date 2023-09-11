@@ -17,6 +17,6 @@ import { BreedController } from './infrastructure/controller/breed.controller';
     ],
     controllers: [BreedController],
     providers: [BreedImplService, BreedImplRepository],
-    exports:[BreedImplService]
+    exports:[BreedImplRepository]
 })
 export class BreedModule { }
