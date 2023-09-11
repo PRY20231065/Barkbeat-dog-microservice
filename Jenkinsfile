@@ -16,6 +16,7 @@ pipeline {
         stage('Clean') {
             agent any
             steps {
+                sh "docker service ls | grep ${NAME}-container && echo service-exists"
                 sh "docker stop ${NAME}-container"
                 sh "docker rm ${NAME}-container"
             }
