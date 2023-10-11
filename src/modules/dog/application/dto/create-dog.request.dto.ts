@@ -32,7 +32,7 @@ export class CreateDogRequestDTO {
     weight: number;
 
     @ApiProperty()
-    @IsNotEmpty()
+    //@IsNotEmpty()
     @AutoMap()
     veterinarian_id: string;
 

@@ -212,7 +212,7 @@ export class DogImplService implements DogService {
         if (dogRequest.breed_id !== null) {
             await validateBreedExistence(dogRequest.breed_id, this.breedRepository);
         }
-        if (dogRequest.veterinarian_id !== null) {
+        if (dogRequest.veterinarian_id !== null && dogRequest.veterinarian_id !== undefined) {
             await validateVetExistence(dogRequest.veterinarian_id,  this.jwtService ,this.httpService);
         }
         await validateOwnerExistence(dogRequest.owner_id,  this.jwtService ,this.httpService);
