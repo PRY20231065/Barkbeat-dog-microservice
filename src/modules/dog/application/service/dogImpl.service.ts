@@ -17,6 +17,7 @@ import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class DogImplService implements DogService {
+
     constructor(
         private readonly dogRepository: DogImplRepository,
         private readonly breedRepository: BreedImplRepository,
@@ -60,6 +61,15 @@ export class DogImplService implements DogService {
             startKey: pagination.startKey ? JSON.parse(pagination.startKey) : null,
             items: dogs,
             lastKey: dogs.lastKey ? dogs.lastKey : null,
+        }
+    }
+
+    async findAllDogsWithoutVet(): Promise<IGenericResponse<Dog[]>> {
+        const list = await this.dogRepository.findDogsWithoutVeterinarianId();
+        return {
+            success: true,
+            code: HttpStatus.OK,
+            data: list,
         }
     }
 

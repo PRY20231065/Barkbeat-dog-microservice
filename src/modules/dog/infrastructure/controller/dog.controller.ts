@@ -38,6 +38,12 @@ export class DogController {
         return await this.dogService.findAllDogs(pagination);
     }
 
+    @ApiOperation({summary: 'Obtener dogs con vet-id nulo o sin asignar'})
+    @Get('/withoutVet')
+    async getDogsWithoutVet(){
+        return await this.dogService.findAllDogsWithoutVet();
+    }
+
     /*@ApiOperation({ summary: 'Obtener dogs por OwnerId' })
     @ApiQuery({ name: 'ownerId', type: String, required: true })
     @Get('filter')

@@ -8,6 +8,7 @@ import { IPaginatedStartKey } from "src/utils/generic";
 
 @Injectable()
 export class DogImplRepository implements DogRepository {
+  
 
     constructor(
         @InjectModel('dog')
@@ -81,6 +82,13 @@ export class DogImplRepository implements DogRepository {
 
         const dogs = await queryItems.exec();
         return {dogs, totalCount};
+    }
+
+
+    async findDogsWithoutVeterinarianId() {
+        const queryItems = await this.dogModel.scan().where('veterinarian_id').not().exists();
+        const dogs = await queryItems.exec();
+        return dogs;
     }
 
     async findDogsByBreedId(breed_id: string, size: string, startKey: string): Promise<any> {
