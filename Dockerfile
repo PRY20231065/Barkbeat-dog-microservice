@@ -2,7 +2,7 @@ FROM node:18-alpine
 WORKDIR /user/src/app
 COPY . .
 
-EXPOSE 443
+EXPOSE 19211
 
 RUN npm install
 RUN npm install dotenv

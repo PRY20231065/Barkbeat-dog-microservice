@@ -1,0 +1,13 @@
+version: '3'
+services:
+  dog-microservice:
+    image: dog-microservice
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dog-microservice-container
+    restart: always
+    ports:
+      - "19211:19211"
+    env_file:
+      - .env
